@@ -1,14 +1,12 @@
 package com.github.hintofbasil.crabbler.Questions.QuestionExpanders;
 
-import android.media.Image;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.hintofbasil.crabbler.BackgroundDataPost.DataPostHelpers.PostHelper;
 import com.github.hintofbasil.crabbler.R;
 
 import org.json.JSONArray;

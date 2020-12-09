@@ -1,16 +1,16 @@
 package com.github.hintofbasil.crabbler.Questions.QuestionExpanders;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.github.hintofbasil.crabbler.ColorListAdapter;
+import com.github.hintofbasil.crabbler.GlobalVariables;
 import com.github.hintofbasil.crabbler.R;
 
 import org.json.JSONArray;
@@ -73,6 +73,14 @@ public class YearChoiceExpander extends Expander {
             }
         });
 
+        yearsAdapter = new ColorListAdapter<String>(
+                activity.getBaseContext(),
+                R.layout.list_background,
+                activity.getResources().getStringArray(R.array.years),
+                yearNo,
+                currentYear - 2016);
+        yearListView.setAdapter(yearsAdapter);
+
         // Fix scrolling
         yearListView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -104,13 +112,14 @@ public class YearChoiceExpander extends Expander {
             Log.d("TwoChoiceDate", "No previous month");
         }
 
-        yearsAdapter = new ColorListAdapter<String>(
-                    activity.getBaseContext(),
-                    R.layout.list_background,
-                    activity.getResources().getStringArray(R.array.years),
-                    yearNo,
-                    currentYear - 2016);
-        yearListView.setAdapter(yearsAdapter);
+        /*yearsAdapter = new ColorListAdapter<String>(
+                activity.getBaseContext(),
+                R.layout.list_background,
+                activity.getResources().getStringArray(R.array.years),
+                yearNo,
+                currentYear - 2016);
+        yearListView.setAdapter(yearsAdapter);*/
+        yearListView.setItemChecked(yearNo, true);
     }
 
     @Override

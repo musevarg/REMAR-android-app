@@ -1,26 +1,31 @@
 package com.github.hintofbasil.crabbler.Questions.QuestionExpanders;
 
-import android.content.Intent;
 import android.os.CountDownTimer;
-import android.support.v7.app.AppCompatActivity;
-import android.widget.ImageView;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.text.method.LinkMovementMethod;
+import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.hintofbasil.crabbler.BackgroundDataPost.DataPostFactory;
-import com.github.hintofbasil.crabbler.Questions.QuestionActivity;
 import com.github.hintofbasil.crabbler.R;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.util.Date;
 
 /**
  * Created by will on 05/06/16.
  */
 public class DoneExpander extends Expander {
 
-    public static final int SEND_DELAY = 6000;
+    public static final int SEND_DELAY = 4000;
 
     public DoneExpander(AppCompatActivity activity, JSONObject questionJson) {
         super(activity, questionJson, 0);
@@ -30,11 +35,14 @@ public class DoneExpander extends Expander {
     public void expandLayout() throws JSONException {
         activity.setContentView(R.layout.expander_done);
 
-        TextView backText = (TextView) activity.findViewById(R.id.backText);
-        TextView forwardText = (TextView) activity.findViewById(R.id.forwardText);
-
-        backText.setText("");
-        forwardText.setText("");
+        Float density = activity.getBaseContext().getResources().getDisplayMetrics().density;
+        if (density < 3)
+        {
+            TextView t1 = activity.findViewById(R.id.text1_done);
+            TextView t2 = activity.findViewById(R.id.text2_done);
+            t1.setTextSize(18);
+            t2.setTextSize(18);
+        }
 
         //ImageView imageView = (ImageView) activity.findViewById(R.id.image);
         //TextView titleView = (TextView) activity.findViewById(R.id.title);
@@ -71,12 +79,17 @@ public class DoneExpander extends Expander {
     }
 
     private void postAnswers() {
-        DataPostFactory dataPostFactory = new DataPostFactory(activity.getBaseContext());
-        dataPostFactory.submitAnswers();
+            DataPostFactory dataPostFactory = new DataPostFactory(activity.getBaseContext());
+            dataPostFactory.submitAnswers();
 
-        Toast.makeText(activity.getBaseContext(),
-                activity.getString(R.string.thank_you_toast),
-                Toast.LENGTH_LONG).show();
+            /*Toast.makeText(activity.getBaseContext(),
+                    activity.getString(R.string.thank_you_toast),
+                    Toast.LENGTH_LONG).show();*/
+
+        View v = activity.findViewById(R.id.doneScrollView);
+        Snackbar snackBar = Snackbar.make(v, activity.getString(R.string.thank_you_toast), 3000);
+        snackBar.show();
+
     }
 
     private void toFirstQuestion() {
@@ -84,6 +97,6 @@ public class DoneExpander extends Expander {
                 ReturnExpander.class);
         activity.startActivity(intent);
         activity.finish();*/
-        nextQuestion(0);
+        nextQuestion(0, 1);
     }
 }

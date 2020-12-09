@@ -1,7 +1,7 @@
 package com.github.hintofbasil.crabbler.Questions.QuestionExpanders;
 
-import android.graphics.Paint;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -35,7 +35,7 @@ public class TwoPictureLayoutExpander extends Expander {
     @Override
     public void expandLayout() throws JSONException {
         activity.setContentView(R.layout.expander_two_picture_choice);
-        TextView questionText = (TextView) activity.findViewById(R.id.question_text);
+        final TextView questionText = (TextView) activity.findViewById(R.id.question_text);
         TextView choiceOneTitle = (TextView) activity.findViewById(R.id.choice_one_title);
         TextView choiceTwoTitle = (TextView) activity.findViewById(R.id.choice_two_title);
         questionOneButton = (LinearLayout) activity.findViewById(R.id.question_one_button);
@@ -51,8 +51,72 @@ public class TwoPictureLayoutExpander extends Expander {
         questionText.setText(getRichTextQuestionString("questionText"));
         questionText.setMovementMethod(new ScrollingMovementMethod());
 
-        choiceOneTitle.setText(getRichTextQuestionString("choiceOneTitle"));
-        choiceTwoTitle.setText(getRichTextQuestionString("choiceTwoTitle"));
+        /* This piece of code below makes sure that the crab species texts have the same size
+        *
+        *  The current design uses an AutoFitTextView and it is not possible to return the modified
+        *  text size programmatically, this will only return the default text size
+        *  I had to get a little creative here and calculate the length difference between the two strings
+        *  then add the relevant blank spaces to the string so both strings appear to be the same size
+         */
+
+        String title1 = "", title2 = "";
+
+        if (getRichTextQuestionString("choiceOneTitle").length() < getRichTextQuestionString("choiceTwoTitle").length())
+        {
+            int diff = getRichTextQuestionString("choiceTwoTitle").length() - getRichTextQuestionString("choiceOneTitle").length();
+            // If diff is not even, add a space to the longest string so it has the same text size than the shortest string with added spaces
+            if(diff%2!=0){
+                diff++;
+                title2 += getRichTextQuestionString("choiceTwoTitle") + " ";
+            }
+            else
+            {
+                title2 += getRichTextQuestionString("choiceTwoTitle");
+            }
+
+            // Add spaces to each side of the shortest string
+            for (int i=0; i<(diff/2)+1; i++)
+            {
+                title1 += " ";
+            }
+            title1 += getRichTextQuestionString("choiceOneTitle");
+            for (int i=0; i<(diff/2)+1; i++)
+            {
+                title1 += " ";
+            }
+        }
+        else
+        {
+            int diff = getRichTextQuestionString("choiceOneTitle").length() - getRichTextQuestionString("choiceTwoTitle").length();
+            // If diff is not even, add a space to the longest string so it has the same text size than the shortest string with added spaces
+            if(diff%2!=0){
+                diff++;
+                title1 += getRichTextQuestionString("choiceOneTitle") + " ";
+            }
+            else
+            {
+                title1 += getRichTextQuestionString("choiceOneTitle");
+            }
+
+            // Add spaces to each side of the shortest string
+            for (int i=0; i<(diff/2)+1; i++)
+            {
+                title2 += " ";
+            }
+            title2 += getRichTextQuestionString("choiceTwoTitle");
+            for (int i=0; i<(diff/2)+1; i++)
+            {
+                title2 += " ";
+            }
+        }
+
+        /* End of text resize, we can set the text then */
+
+        choiceOneTitle.setText(title1);
+        choiceTwoTitle.setText(title2);
+
+        Log.d("TwoPictureLayout", "t1:" + title1 + " / t2: " + title2);
+
 
         backText.setText(getRichTextQuestionString("backText"));
         forwardText.setText(getRichTextQuestionString("forwardText"));
@@ -61,8 +125,10 @@ public class TwoPictureLayoutExpander extends Expander {
             @Override
             public void onClick(View v) {
                 currentAnswer = 0;
-                questionTwoButton.setBackgroundResource(R.color.questionBackground);
-                questionOneButton.setBackgroundResource(R.color.questionSelectedBackground);
+                /*questionTwoButton.setBackgroundResource(R.color.questionBackground);
+                questionOneButton.setBackgroundResource(R.color.questionSelectedBackground);*/
+                questionOneButton.setSelected(true);
+                questionTwoButton.setSelected(false);
                 try
                 {
                     choiceOneImage.setImageDrawable(getDrawable(getQuestionString("choiceOnePicTwo")));
@@ -70,7 +136,7 @@ public class TwoPictureLayoutExpander extends Expander {
                 } catch (JSONException e) {}
 
                 enableDisableNext();
-                //nextQuestion(200);
+                nextQuestion(0, 1);
             }
         });
 
@@ -78,8 +144,10 @@ public class TwoPictureLayoutExpander extends Expander {
             @Override
             public void onClick(View v) {
                 currentAnswer = 1;
-                questionOneButton.setBackgroundResource(R.color.questionBackground);
-                questionTwoButton.setBackgroundResource(R.color.questionSelectedBackground);
+                /*questionOneButton.setBackgroundResource(R.color.questionBackground);
+                questionTwoButton.setBackgroundResource(R.color.questionSelectedBackground);*/
+                questionOneButton.setSelected(false);
+                questionTwoButton.setSelected(true);
                 try
                 {
                     choiceOneImage.setImageDrawable(getDrawable(getQuestionString("choiceOnePicture")));
@@ -87,7 +155,7 @@ public class TwoPictureLayoutExpander extends Expander {
                 } catch (JSONException e) {}
 
                 enableDisableNext();
-                //nextQuestion(200);
+                nextQuestion(0, 1);
             }
         });    }
 
@@ -97,11 +165,13 @@ public class TwoPictureLayoutExpander extends Expander {
             Integer i = answer.getInt(0);
             switch(i) {
                 case 0:
-                    questionOneButton.setBackgroundResource(R.color.questionSelectedBackground);
+                    //questionOneButton.setBackgroundResource(R.color.questionSelectedBackground);
+                    questionOneButton.setSelected(true);
                     choiceOneImage.setImageDrawable(getDrawable(getQuestionString("choiceOnePicTwo")));
                     break;
                 case 1:
-                    questionTwoButton.setBackgroundResource(R.color.questionSelectedBackground);
+                    //questionTwoButton.setBackgroundResource(R.color.questionSelectedBackground);
+                    questionTwoButton.setSelected(true);
                     choiceTwoImage.setImageDrawable(getDrawable(getQuestionString("choiceTwoPicTwo")));
                     break;
                 default:

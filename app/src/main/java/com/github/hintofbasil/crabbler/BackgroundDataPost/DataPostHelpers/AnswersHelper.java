@@ -3,11 +3,13 @@ package com.github.hintofbasil.crabbler.BackgroundDataPost.DataPostHelpers;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.github.hintofbasil.crabbler.GlobalVariables;
 import com.github.hintofbasil.crabbler.Keys;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URL;
 import java.util.Map;
 
 /**
@@ -20,8 +22,8 @@ public class AnswersHelper extends PostHelper {
     private String questions;
     private SharedPreferences prefs;
 
-    public AnswersHelper(SharedPreferences prefs, String questions) {
-        super("http://crab.napier.ac.uk/api/0.2/sightings");
+    public AnswersHelper(SharedPreferences prefs, String questions, String url) {
+        super(url);
         this.questions = questions;
         this.prefs = prefs;
     }

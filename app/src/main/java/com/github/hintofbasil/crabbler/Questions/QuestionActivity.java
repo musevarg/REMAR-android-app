@@ -1,12 +1,17 @@
 package com.github.hintofbasil.crabbler.Questions;
 
+import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.hintofbasil.crabbler.AboutUsActivity;
@@ -16,7 +21,6 @@ import com.github.hintofbasil.crabbler.Questions.QuestionExpanders.ChoiceSelectE
 import com.github.hintofbasil.crabbler.Questions.QuestionExpanders.CommitExpander;
 import com.github.hintofbasil.crabbler.Questions.QuestionExpanders.ModeChooseExpander;
 import com.github.hintofbasil.crabbler.Questions.QuestionExpanders.MonthChoiceExpander;
-import com.github.hintofbasil.crabbler.Questions.QuestionExpanders.OneChoiceExpander;
 import com.github.hintofbasil.crabbler.Questions.QuestionExpanders.ReturnExpander;
 import com.github.hintofbasil.crabbler.Questions.QuestionExpanders.ThreeChoiceExpander;
 import com.github.hintofbasil.crabbler.Questions.QuestionExpanders.UserDetailsExpander;
@@ -34,7 +38,6 @@ import com.github.hintofbasil.crabbler.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 
 public class QuestionActivity extends AppCompatActivity {
@@ -95,9 +98,6 @@ public class QuestionActivity extends AppCompatActivity {
                     case "YearChoice":
                         expander = new YearChoiceExpander(this, questionJson);
                         break;
-                    case "OneChoice":
-                        expander = new OneChoiceExpander(this, questionJson);
-                        break;
                     case "ThreeChoice":
                         expander = new ThreeChoiceExpander(this, questionJson);
                         break;
@@ -135,9 +135,9 @@ public class QuestionActivity extends AppCompatActivity {
             int definedQuestionCount = qr.getQuestionCount();
             try {
                 qr.getJsonQuestion(questionId).getInt("questionNumber");
-                pageOf.setText(String.format("%d/%d", questionId + 1, definedQuestionCount));
+                pageOf.setText(String.format("%d/%d", questionId-1, definedQuestionCount-3));
             } catch (JSONException|NullPointerException e) {
-                pageOf.setVisibility(View.INVISIBLE);
+                //pageOf.setVisibility(View.INVISIBLE);
                 Log.i("QuestionActivity", "No question number.  Not displaying question of question");
             }
 
@@ -148,18 +148,20 @@ public class QuestionActivity extends AppCompatActivity {
             }
 
             //Disable next
-            if(questionId==realQuestionCount) {
+            if(questionId-1==realQuestionCount) {
                 ImageView nextButton = (ImageView) findViewById(R.id.forward_button);
                 nextButton.setEnabled(false);
             }
 
-            if(questionId != 1) { // Only show menu button on first question
+            /*if(questionId != 1) { // Only show menu button on first question
                 LinearLayout menuButton = (LinearLayout) findViewById(R.id.toolbar_menu_button);
                 menuButton.setVisibility(View.GONE);
             } else { //Hide images if menu button is present
-                LinearLayout toolbarImages = (LinearLayout) findViewById(R.id.toolbar_images);
-                toolbarImages.setVisibility(View.GONE);
-            }
+                LinearLayout toolbarImage1 = (LinearLayout) findViewById(R.id.toolbar_image1);
+                LinearLayout toolbarImage2 = (LinearLayout) findViewById(R.id.toolbar_image2);
+                toolbarImage1.setVisibility(View.GONE);
+                toolbarImage2.setVisibility(View.GONE);
+            } */
 
         } catch (IOException|JSONException e) {
             Log.e("QuestionActivity", "Error reading questions\n" + Log.getStackTraceString(e));
@@ -171,17 +173,18 @@ public class QuestionActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         if(expander!=null) {
-            expander.setPreviousAnswer();
-            expander.enableDisableNext();
+                expander.setPreviousAnswer();
+                expander.enableDisableNext();
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void previousQuestion(View view) {
         expander.previousQuestion();
     }
 
     public void nextQuestion(View view) {
-        expander.nextQuestion(0);
+        expander.nextQuestion(0, 1);
     }
 
     public void menuClick(View view) {
@@ -189,5 +192,39 @@ public class QuestionActivity extends AppCompatActivity {
         Intent intent = new Intent(getBaseContext(),
                 AboutUsActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        if (expander.getClass().getSimpleName().equals("ModeChooseExpander"))
+        {
+            Intent startMain = new Intent(Intent.ACTION_MAIN);
+            startMain.addCategory(Intent.CATEGORY_HOME);
+            startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(startMain);
+        }
+        else if (expander.getClass().getSimpleName().equals("DoneExpander"))
+        {
+            // No action on this page
+        }
+        else if (expander.getClass().getSimpleName().equals("AutoExpander"))
+        {
+            // No action on this page
+        }
+        else if (expander.getClass().getSimpleName().equals("ReturnExpander"))
+        {
+            SharedPreferences answerPrefs = this.getSharedPreferences(Keys.SAVED_PREFERENCES_KEY, Context.MODE_PRIVATE);
+            answerPrefs.edit().clear().apply();
+            Intent intent = new Intent(getBaseContext(), QuestionActivity.class);
+            intent.putExtra(Keys.QUESTION_ID_KEY, 1);
+            startActivity(intent);
+            this.finish();
+        }
+        else
+        {
+            expander.previousQuestion();
+            this.finish();
+        }
     }
 }

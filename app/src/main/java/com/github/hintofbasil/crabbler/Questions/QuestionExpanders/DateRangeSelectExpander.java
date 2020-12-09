@@ -1,18 +1,16 @@
 package com.github.hintofbasil.crabbler.Questions.QuestionExpanders;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.hintofbasil.crabbler.Caldroid.CaldroidCustomFragment;
-import com.github.hintofbasil.crabbler.Keys;
 import com.github.hintofbasil.crabbler.R;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
@@ -28,7 +26,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -96,12 +93,12 @@ public class DateRangeSelectExpander extends Expander {
                         Log.d("DateRangeSelect", "test2");
                     }
                     selectedViews[block] = view;
-                    view.setBackgroundResource(R.color.questionSelectedBackground);
-                    caldroidFragment.setBackgroundDrawableForDate(activity.getResources().getDrawable(R.color.questionSelectedBackground), selectedDates[0]);
+                    view.setBackgroundResource(R.color.calendarCell2);
+                    caldroidFragment.setBackgroundDrawableForDate(activity.getResources().getDrawable(R.color.calendarCell2), selectedDates[0]);
                     Log.d("DateRangeSelect", "test3");
                     caldroidFragment.refreshView();
+                    enableDisableNext();
                 }
-                enableDisableNext();
             }
         };
 
@@ -138,13 +135,15 @@ public class DateRangeSelectExpander extends Expander {
     @Override
     protected void setPreviousAnswer(JSONArray answer) {
         try {
-            String s = (String) answer.get(0);
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
-            Date date = simpleDateFormat.parse(s);
-            selectedDates[0] = date;
-            caldroidFragment.setBackgroundDrawableForDate(activity.getResources().getDrawable(R.color.questionSelectedBackground), selectedDates[0]);
+                Log.d("DATE", answer.get(0).toString());
+                String s = (String) answer.get(0);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                Date date = simpleDateFormat.parse(s);
+                selectedDates[0] = date;
+                caldroidFragment.setBackgroundDrawableForDate(activity.getResources().getDrawable(R.color.calendarCell2), selectedDates[0]);
+                enableDisableNext();
         } catch (ParseException|JSONException e) {
-            Log.e("DateRangeExpander", "Unable to create date from answer " + Log.getStackTraceString(e));
+            Log.d("DateRangeExpander", "Unable to create date from answer"); //+ Log.getStackTraceString(e));
             return;
         }
     }
@@ -154,7 +153,7 @@ public class DateRangeSelectExpander extends Expander {
         JSONArray array = new JSONArray();
         for(Date d : selectedDates) {
             if(d != null) {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 array.put(simpleDateFormat.format(d));
             }
         }
@@ -171,7 +170,7 @@ public class DateRangeSelectExpander extends Expander {
             JSONArray previousAnswer = questionManager.getAnswer(filterOn);
             for (int i=0; i<previousAnswer.length(); i++) {
                 String s = previousAnswer.getString(i);
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 Date date = simpleDateFormat.parse(s);
                 lst.add(date);
             }

@@ -1,8 +1,10 @@
 package com.github.hintofbasil.crabbler.Questions.QuestionExpanders;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,6 +21,7 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -89,19 +92,17 @@ public class DateRangeExpander extends Expander {
 
     @Override
     protected void setPreviousAnswer(JSONArray answer) {
+        Log.d("DateRangeExpander", answer.toString());
         for (int i=0; i<answer.length(); i++) {
             try {
                 String s = (String) answer.get(i);
                 // Requires new SimpleDateFormat for each parse.
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
-                Date date = simpleDateFormat.parse(s.toString());
-                int dateMonth = date.getMonth();
-                int dateYear = date.getYear();
-                if(dateMonth==month&&dateYear==year+116)
-                {
-                    selectedDates.add(date);
-                    caldroidFragment.setSelectedDate(date);
-                }
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                Date date = simpleDateFormat.parse(s);
+                int dateMonth =  Integer.parseInt((String) DateFormat.format("MM",  date));
+                int dateYear = Integer.parseInt((String) DateFormat.format("yyyy",  date));
+                selectedDates.add(date);
+                caldroidFragment.setSelectedDate(date);
             } catch (ParseException|JSONException e) {
                 Log.e("DateRangeExpander", "Unable to create date from answer " + Log.getStackTraceString(e));
                 return;
@@ -112,7 +113,7 @@ public class DateRangeExpander extends Expander {
     @Override
     public JSONArray getSelectedAnswer() {
         JSONArray array = new JSONArray();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         for (Date date: selectedDates) {
             String dateString = simpleDateFormat.format(date);
             array.put(dateString);

@@ -19,6 +19,7 @@ public class LoginHelper extends PostHelper {
 
     public LoginHelper(SharedPreferences prefs) {
         super("http://crab.napier.ac.uk/api/0.1/auth");
+        //super(null);
         this.prefs = prefs;
     }
 

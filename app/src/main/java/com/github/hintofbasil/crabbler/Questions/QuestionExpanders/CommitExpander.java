@@ -1,13 +1,22 @@
 package com.github.hintofbasil.crabbler.Questions.QuestionExpanders;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Build;
+import android.provider.Settings;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.hintofbasil.crabbler.GlobalVariables;
+import com.github.hintofbasil.crabbler.Keys;
+import com.github.hintofbasil.crabbler.Questions.QuestionActivity;
 import com.github.hintofbasil.crabbler.R;
 
 import org.json.JSONArray;
@@ -15,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -26,6 +36,7 @@ public class CommitExpander extends Expander {
 
     Button choiceOneButton;
     Button choiceTwoButton;
+    Button choiceThreeButton;
     boolean allowMultiple = false;
 
     public CommitExpander(AppCompatActivity activity, JSONObject questionJson) {
@@ -40,10 +51,12 @@ public class CommitExpander extends Expander {
         TextView description = (TextView) activity.findViewById(R.id.description);
         choiceOneButton = (Button) activity.findViewById(R.id.choice_one);
         choiceTwoButton = (Button) activity.findViewById(R.id.choice_two);
+        choiceThreeButton = (Button) activity.findViewById(R.id.choice_three);
 
         //imageView.setImageDrawable(getDrawable(getQuestionString("questionPicture")));
         //titleView.setText(getRichTextQuestionString("questionTitle"));
         description.setText(getRichTextQuestionString("description"));
+        description.setMovementMethod(LinkMovementMethod.getInstance());
         choiceOneButton.setText(getRichTextQuestionString("choiceOneText"));
         choiceTwoButton.setText(getRichTextQuestionString("choiceTwoText"));
 
@@ -68,14 +81,43 @@ public class CommitExpander extends Expander {
         choiceOneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            nextQuestion(0);
+                GlobalVariables.appTest = false;
+                nextQuestion(1, 1);
             }
         });
 
         choiceTwoButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
             previousQuestion();
+            }
+        });
+
+        choiceThreeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GlobalVariables.appTest = true;
+                AlertDialog.Builder appTestAlertDialog = new AlertDialog.Builder(activity, R.style.AlertDialogCustom);
+
+                appTestAlertDialog.setTitle(R.string.testWarning);
+                appTestAlertDialog.setMessage(R.string.testWarningContent);
+                appTestAlertDialog.setPositiveButton(R.string.testWarningAccept, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                nextQuestion(1, 2);
+                            };
+                        });
+                appTestAlertDialog.setNegativeButton(R.string.testWarningBack, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            };
+                        });
+
+                appTestAlertDialog.create();
+                appTestAlertDialog.show();
+
             }
         });
     }
@@ -88,7 +130,8 @@ public class CommitExpander extends Expander {
     @Override
     public JSONArray getSelectedAnswer() {
         JSONArray array = new JSONArray();
-        array.put(DateFormat.getDateTimeInstance().format(new Date()).toString());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        array.put(simpleDateFormat.format(new Date()));
         return array;
     }
 }

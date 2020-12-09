@@ -1,20 +1,18 @@
 package com.github.hintofbasil.crabbler.Questions.QuestionExpanders;
 
-import android.support.v7.app.AppCompatActivity;
-import android.text.method.ScrollingMovementMethod;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.github.hintofbasil.crabbler.Questions.QuestionActivity;
 import com.github.hintofbasil.crabbler.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 /**
  * Created by will on 05/05/16.
@@ -24,7 +22,7 @@ public class AutoExpander extends Expander {
     private static final int REQUIRED_ANSWERS = 1;
 
     private int currentAnswer = -1;
-    LinearLayout questionOneButton;
+    RelativeLayout questionOneButton;
     private String version;
 
     public AutoExpander(AppCompatActivity activity, JSONObject questionJson) {
@@ -39,7 +37,7 @@ public class AutoExpander extends Expander {
         ImageView previousButton = (ImageView) activity.findViewById(R.id.back_button);
         ImageView nextButton = (ImageView) activity.findViewById(R.id.forward_button);
         TextView pageNumber = (TextView) activity.findViewById(R.id.page_of);
-        questionOneButton = (LinearLayout) activity.findViewById(R.id.question_one_button);
+        questionOneButton = (RelativeLayout) activity.findViewById(R.id.question_one_button);
         ImageView choiceOneImage = (ImageView) activity.findViewById(R.id.choice_one_image);
         TextView backText = (TextView) activity.findViewById(R.id.backText);
         TextView forwardText = (TextView) activity.findViewById(R.id.forwardText);
@@ -60,7 +58,7 @@ public class AutoExpander extends Expander {
         nextButton.setVisibility(View.GONE);
         pageNumber.setVisibility(View.GONE);
 
-        nextQuestion(6000);
+        nextQuestion(4000, 1);
 
         }
 

@@ -2,6 +2,8 @@ package com.github.hintofbasil.crabbler.BackgroundDataPost.DataPostHelpers;
 
 import android.util.Log;
 
+import com.github.hintofbasil.crabbler.GlobalVariables;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -42,7 +44,7 @@ public abstract class PostHelper {
         }
         String response = doPost(getData());
         if(response!=null) {
-            Log.i("PostHelper", "Posted: " + url);
+            Log.i("PostHelper", "Posted to: " + url);
             responseData = response;
         }
     }

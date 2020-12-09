@@ -1,6 +1,6 @@
 package com.github.hintofbasil.crabbler.Questions.QuestionExpanders;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -8,14 +8,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.github.hintofbasil.crabbler.ColorListAdapter;
@@ -28,7 +26,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * Created by will on 25/05/16.
@@ -293,6 +290,7 @@ public class YesNoExtraExpander extends Expander {
 
             setListViewHeightBasedOnChildren(extraListview, 6);
 
+
         } catch (JSONException e) {
             Log.d("YesNoExtra", "Failed to obtain a value for state, defaults to a empty string. " + e.getMessage());
         }
@@ -301,8 +299,9 @@ public class YesNoExtraExpander extends Expander {
     @Override
     protected void setPreviousAnswer(JSONArray answer) {
         int j = -1;
+        Log.d("PROTECTED AREA", answer.toString());
         try {
-            int i = answer.getInt(0);
+            int i = Integer.parseInt(answer.get(0).toString());
             switch(i) {
                 case 0:
                     chkYes.setChecked(true);
@@ -392,15 +391,15 @@ public class YesNoExtraExpander extends Expander {
         if(answer.length() > 0) {
             switch (answer.getInt(0)) {
                 case 0:
-                    chkYes.setChecked(true);
+                    //chkYes.setChecked(true);
                     hiddenInputContainer.setVisibility(View.VISIBLE);
                     expander.requiredAnswers = 2;
                     break;
                 case 1:
-                    chkNo.setChecked(true);
+                    //chkNo.setChecked(true);
                     break;
                 case 2:
-                    chkMaybe.setChecked(true);
+                    //chkMaybe.setChecked(true);
                     break;
             }
         }

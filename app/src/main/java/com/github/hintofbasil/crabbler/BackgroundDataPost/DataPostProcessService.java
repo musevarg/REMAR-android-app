@@ -11,6 +11,7 @@ import com.github.hintofbasil.crabbler.BackgroundDataPost.DataPostHelpers.Answer
 import com.github.hintofbasil.crabbler.BackgroundDataPost.DataPostHelpers.LoginHelper;
 import com.github.hintofbasil.crabbler.BackgroundDataPost.DataPostHelpers.PostHelper;
 import com.github.hintofbasil.crabbler.BackgroundDataPost.DataPostHelpers.RegisterHelper;
+import com.github.hintofbasil.crabbler.GlobalVariables;
 import com.github.hintofbasil.crabbler.Keys;
 
 import java.io.IOException;
@@ -65,7 +66,7 @@ public class DataPostProcessService extends IntentService {
                                 helper = new LoginHelper(settingsPrefs);
                                 break;
                             case DataPostFactory.ANSWERS:
-                                helper = new AnswersHelper(settingsPrefs, split[1]);
+                                helper = new AnswersHelper(settingsPrefs, split[1], setAnswerHelperURL());
                                 break;
                             default:
                                 Log.e("DataPostProcessService", "Unknown Helper: " + split[0]);
@@ -89,5 +90,20 @@ public class DataPostProcessService extends IntentService {
         } else {
             Log.i("DataPostProcessService", "No network connection available");
         }
+    }
+
+    private String setAnswerHelperURL(){
+        String url;
+        if (GlobalVariables.appTest == false)
+        {
+            //this.url = new URL("http://192.168.1.84:8080/api/0.2/sightings");
+            url = "http://crab.napier.ac.uk/api/0.2/sightings";
+
+        }
+        else
+        {
+            url = null;
+        }
+        return url;
     }
 }

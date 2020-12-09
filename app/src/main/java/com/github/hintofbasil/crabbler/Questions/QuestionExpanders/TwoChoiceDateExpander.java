@@ -1,6 +1,6 @@
 package com.github.hintofbasil.crabbler.Questions.QuestionExpanders;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,7 +18,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
-import java.util.Date;
 
 public class TwoChoiceDateExpander extends Expander {
 

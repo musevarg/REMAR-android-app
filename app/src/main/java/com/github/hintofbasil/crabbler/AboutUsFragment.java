@@ -1,4 +1,5 @@
 package com.github.hintofbasil.crabbler;
+
 import android.text.Html;
 
 import android.app.Fragment;

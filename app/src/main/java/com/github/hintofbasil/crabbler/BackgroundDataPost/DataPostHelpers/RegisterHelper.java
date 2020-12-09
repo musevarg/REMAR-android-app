@@ -22,6 +22,7 @@ public class RegisterHelper extends PostHelper {
 
     public RegisterHelper(SharedPreferences prefs, Context context) {
         super("http://crab.napier.ac.uk/api/0.2/users");
+        //super(null);
         this.prefs = prefs;
         this.context = context;
     }
@@ -41,7 +42,7 @@ public class RegisterHelper extends PostHelper {
             JSONObject responseJson = new JSONObject(responseData);
             String id = responseJson.getString("phone_id");
             //TODO use contant
-            prefs.edit().putString(Keys.PHONE_ID_KEY, id).commit();
+            prefs.edit().putString(Keys.PHONE_ID_KEY, id).apply();
             Log.i("RegisterHelper", "Phone id: " + id);
             return true;
         } catch (JSONException e) {

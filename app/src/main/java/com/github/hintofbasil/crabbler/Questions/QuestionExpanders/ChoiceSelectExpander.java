@@ -1,25 +1,19 @@
 package com.github.hintofbasil.crabbler.Questions.QuestionExpanders;
 
-import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.textservice.TextInfo;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.text.*;
 
 import com.github.hintofbasil.crabbler.ColorListAdapter;
 import com.github.hintofbasil.crabbler.R;
@@ -27,19 +21,15 @@ import com.github.hintofbasil.crabbler.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.Objects;
 
 /**
  * Created by will on 19/05/16.
  */
+
 public class ChoiceSelectExpander extends Expander {
 
     private static final int REQUIRED_ANSWERS = 1;
@@ -49,6 +39,7 @@ public class ChoiceSelectExpander extends Expander {
     LinearLayout dontKnow;
     TextView dontKnowTextView;
     boolean dontKnowSelected;
+    boolean oldPhone;
     TextView otherInfo;
     EditText editInfo;
     int otherSelect;
@@ -127,6 +118,7 @@ public class ChoiceSelectExpander extends Expander {
             if(Boolean.parseBoolean(getQuestionString("enableOther"))) {
                 otherSelect = Integer.parseInt(getQuestionString("otherPosition"));
                 otherInfo.setText(getRichTextQuestionString("otherText"));
+                editInfo.requestFocus();
             }
         } catch (JSONException e) {
             Log.d("ChoiceSelect", "" + e.getStackTrace());
@@ -139,6 +131,10 @@ public class ChoiceSelectExpander extends Expander {
             if(disableCustom) {
                 itemTextInput.setVisibility(View.GONE);
             }
+            else
+            {
+                //itemTextInput.requestFocus();
+            }
         } catch (JSONException e) {
             Log.d("ChoiceSelectExpander", "disableCustom not specified in questions.json.  Enabled by default");
         }
@@ -149,16 +145,43 @@ public class ChoiceSelectExpander extends Expander {
                 dontKnowSelected = !dontKnowSelected;
                 if(dontKnowSelected)
                 {
-                    highlightLinearLayout(dontKnow, R.color.questionSelectedBackground);
+                    itemTextInput.setText("");
+                    itemTextInput.clearFocus();
+                    dontKnow.setSelected(true);
                     enableDisableNext();
+                    oldPhone = true;
                 }
-                else
-                {
-                    highlightLinearLayout(dontKnow, R.color.none);
+                else {
+                    dontKnow.setSelected(false);
+                    itemTextInput.requestFocus();
                     enableDisableNext();
+                    oldPhone = false;
                 }
+                Log.d("DontKnowSelected", ""+dontKnowSelected);
             }
         });
+
+
+
+        itemTextInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus)
+                {
+                    if(dontKnowSelected)
+                    {
+                        enableDisableNext();
+                    }
+                    else
+                    {
+                        disableDisableNext();
+                    }
+                }
+                Log.d("DontKnowSelected2", ""+dontKnowSelected);
+            }
+        });
+
+
 
         try {
             boolean enableDontKnow = Boolean.parseBoolean(getQuestionString("enableDontKnow"));
@@ -194,15 +217,16 @@ public class ChoiceSelectExpander extends Expander {
                     if (adapter != null) {
                         adapter.removeDefault();
                     }
-                    listHolder.setSelection(-1);
-                    listHolder.setSelection(position);
-                    highlightLinearLayout(dontKnow, R.color.none);
+                    /*listHolder.setSelection(-1);
+                    listHolder.setSelection(position);*/
+                    dontKnow.setSelected(false);
                     dontKnowSelected = false;
                     if(position == otherSelect)
                     {
                         expander.requiredAnswers = 2;
                         otherInfo.setVisibility(View.VISIBLE);
                         editInfo.setVisibility(View.VISIBLE);
+                        editInfo.requestFocus();
                     }
                     else
                     {
@@ -277,8 +301,9 @@ public class ChoiceSelectExpander extends Expander {
                 if(s.length()>0)
                 {
                     enableDisableNext();
-                    highlightLinearLayout(dontKnow, R.color.none);
+                    dontKnow.setSelected(false);
                     dontKnowSelected = false;
+                    Log.d("DontKnowSelected3", "" + dontKnowSelected);
                 }
                 else
                 {
@@ -343,13 +368,13 @@ public class ChoiceSelectExpander extends Expander {
                     region = "";
                 }
             } catch (JSONException e) {
-                Log.i("ChoiceSelectExpander", "Unable to parse previous answer");
+                Log.i("ChoiceSelectExpander", "Unable to parse previous answer => " + e);
             }
             try {
                 if (jsonArray != null) {
                     populateLists(region);
                     itemTextInput.setText(region);
-                    Log.i("ChoiceSelectExpander", "Successfully populated list");
+                    Log.i("ChoiceSelectExpander", "Successfully populated list => " + region);
                 } else {
                     Log.e("ChoiceSelectExpander", "No questions to load");
                 }
@@ -363,6 +388,7 @@ public class ChoiceSelectExpander extends Expander {
                     editInfo.setVisibility(View.VISIBLE);
                     expander.requiredAnswers = 2;
                     editInfo.setText(answer.getString(1));
+                    editInfo.requestFocus();
                 }
                 else
                 {
@@ -377,11 +403,11 @@ public class ChoiceSelectExpander extends Expander {
 
                     if(dontKnowSelected)
                     {
-                        highlightLinearLayout(dontKnow, R.color.questionSelectedBackground);
+                        dontKnow.setSelected(true);
                     }
                     else
                     {
-                        highlightLinearLayout(dontKnow, R.color.none);
+                        dontKnow.setSelected(false);
                     }
                 }
             } catch (JSONException e) {}
@@ -398,7 +424,7 @@ public class ChoiceSelectExpander extends Expander {
                     listHolder.setItemChecked(i, multipleSelected[i]);
                 }
             } catch (JSONException e) {
-                Log.i("ChoiceSelectExpander", "Unable to parse previous answer");
+                Log.i("ChoiceSelectExpander", "Unable to parse previous answer => " + e);
             }
         }
     }
@@ -417,7 +443,7 @@ public class ChoiceSelectExpander extends Expander {
                 }
             }
 
-            Log.d("test", ""+Arrays.asList(listStrings).contains(answer));
+            //Log.d("test", ""+Arrays.asList(listStrings).contains(answer));
             if(Arrays.asList(listStrings).contains(answer))
             {
                 array.put(answer);
@@ -531,7 +557,8 @@ public class ChoiceSelectExpander extends Expander {
         listHolder.setAdapter(adapter);
 
         initalSelect = regionId;
-        setListViewHeightBasedOnChildren(listHolder, 6);
+        //setListViewHeightBasedOnChildren(listHolder, 6);
+
     }
 
     public static void setListViewHeightBasedOnChildren(ListView listView, int min) {
@@ -569,13 +596,5 @@ public class ChoiceSelectExpander extends Expander {
 
         listView.setLayoutParams(params);
         listView.requestLayout();
-    }
-
-    private void highlightLinearLayout(LinearLayout layout, int colorId) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            layout.setBackgroundColor(activity.getColor(colorId));
-        } else {
-            layout.setBackgroundColor(activity.getResources().getColor(colorId));
-        }
     }
 }

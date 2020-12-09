@@ -3,16 +3,20 @@ package com.github.hintofbasil.crabbler.Questions.QuestionExpanders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.CountDownTimer;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.Html;
-import android.text.SpannableString;
 import android.text.Spanned;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.github.hintofbasil.crabbler.GlobalVariables;
 import com.github.hintofbasil.crabbler.Keys;
 import com.github.hintofbasil.crabbler.Questions.QuestionActivity;
 import com.github.hintofbasil.crabbler.Questions.QuestionManager;
@@ -68,9 +72,9 @@ public abstract class Expander {
 
     public abstract JSONArray getSelectedAnswer();
 
-    public void nextQuestion(int delay) {
+    public void nextQuestion(int delay, int nextQ) {
         final Intent intent = new Intent(activity, QuestionActivity.class);
-        intent.putExtra(Keys.QUESTION_ID_KEY, realQuestionId + 1);
+        intent.putExtra(Keys.QUESTION_ID_KEY, realQuestionId + nextQ);
         new CountDownTimer(delay, delay) {
 
             @Override
@@ -78,6 +82,7 @@ public abstract class Expander {
 
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onFinish() {
                 try {
@@ -100,12 +105,42 @@ public abstract class Expander {
         return questionManager.getAnswer(id);
     }
 
-    private void saveAnswer() throws IOException, JSONException {
+      public void saveAnswer() throws IOException, JSONException {
         JSONArray answer = getSelectedAnswer();
-        questionManager.saveAnswer(realQuestionId, answer);
-        if(questionJson.has("cacheAnswer")) {
-            setCachedAnswer(answer);
+        // hardcoding app version
+        if (realQuestionId == 1)
+        {
+            questionManager.saveAnswer(realQuestionId, answer);
+            if(questionJson.has("cacheAnswer")) {
+                setCachedAnswer(answer);
+            }
+            JSONArray appVersion = new JSONArray("[\"2.0\"]");
+            questionManager.saveAnswer(0, appVersion);
+            if(questionJson.has("cacheAnswer")) {
+                setCachedAnswer(appVersion);
+            }
         }
+        // Remove date if month is changed
+        else if (realQuestionId == 4){
+            JSONArray empty = new JSONArray();
+            try{
+                if (questionManager.getAnswer(5) != null) {
+                    questionManager.saveAnswer(5, empty);
+                }
+            } catch (Exception e){Log.d("Exander.java (182)", e.getMessage());}
+            questionManager.saveAnswer(realQuestionId, answer);
+            if(questionJson.has("cacheAnswer")) {
+                setCachedAnswer(answer);
+            }
+        }
+        else
+        {
+            questionManager.saveAnswer(realQuestionId, answer);
+            if(questionJson.has("cacheAnswer")) {
+                setCachedAnswer(answer);
+            }
+        }
+
     }
 
     protected Drawable getDrawable(String name) {
@@ -119,6 +154,7 @@ public abstract class Expander {
     public void setPreviousAnswer() {
         try {
             setPreviousAnswer(getCurrentAnswer());
+            Log.d("Expander", "getCurrentAnswer => " + getCurrentAnswer().toString());
         } catch (IOException|JSONException e) {
             JSONArray def = getCachedAnswer();
             if(def!=null) {
@@ -135,6 +171,7 @@ public abstract class Expander {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void previousQuestion() {
         final Intent intent = new Intent(activity, QuestionActivity.class);
         intent.putExtra(Keys.QUESTION_ID_KEY, realQuestionId - 1);
@@ -259,6 +296,7 @@ public abstract class Expander {
     public void forceDisableDisableNext()
     {
         ImageView next = (ImageView) activity.findViewById(R.id.forward_button);
+        next.setEnabled(false);
         if(next != null) {
             next.setEnabled(false);
         } else {

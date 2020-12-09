@@ -1,21 +1,23 @@
 package com.github.hintofbasil.crabbler.Questions.QuestionExpanders;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.github.hintofbasil.crabbler.AboutUsActivity;
 import com.github.hintofbasil.crabbler.Questions.QuestionManager;
 import com.github.hintofbasil.crabbler.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.text.DateFormat;
-import java.util.Date;
 
 /**
  * Created by will on 13/05/16.
@@ -30,6 +32,7 @@ public class ModeChooseExpander extends Expander {
     TextView choiceTwoTitle;
     TextView choiceOneTitleTwo;
     TextView choiceTwoTitleTwo;
+    LinearLayout privacyLink;
     boolean allowMultiple = false;
     int chosenMode;
 
@@ -49,8 +52,8 @@ public class ModeChooseExpander extends Expander {
         choiceTwoTitle = (TextView) activity.findViewById(R.id.choice_two_title);
         choiceOneTitleTwo = (TextView) activity.findViewById(R.id.choice_one_title_two);
         choiceTwoTitleTwo = (TextView) activity.findViewById(R.id.choice_two_title_two);
-        //imageView.setImageDrawable(getDrawable(getQuestionString("questionPicture")));
-        //titleView.setText(getRichTextQuestionString("questionTitle"));
+        privacyLink = (LinearLayout) activity.findViewById(R.id.privacyLink);
+
         description.setText(getRichTextQuestionString("description"));
         choiceOneTitle.setText(getRichTextQuestionString("choiceOneText"));
         choiceTwoTitle.setText(getRichTextQuestionString("choiceTwoText"));
@@ -82,9 +85,11 @@ public class ModeChooseExpander extends Expander {
             public void onClick(View v) {
                 QuestionManager.changeQuestionFile(R.raw.questions2);
                 chosenMode = 0;
-                choiceTwoButton.setBackgroundResource(R.color.questionBackground);
-                choiceOneButton.setBackgroundResource(R.color.questionSelectedBackground);
-                nextQuestion(0);
+                /*choiceTwoButton.setBackgroundResource(R.drawable.background_rounded_green);
+                choiceOneButton.setBackgroundResource(R.drawable.background_rounded_yellow);*/
+                choiceOneButton.setSelected(true);
+                choiceTwoButton.setSelected(false);
+                nextQuestion(0, 1);
             }
         });
 
@@ -93,9 +98,23 @@ public class ModeChooseExpander extends Expander {
             public void onClick(View v) {
                 QuestionManager.changeQuestionFile(R.raw.questions);
                 chosenMode = 1;
-                choiceOneButton.setBackgroundResource(R.color.questionBackground);
-                choiceTwoButton.setBackgroundResource(R.color.questionSelectedBackground);
-                nextQuestion(0);
+                choiceOneButton.setSelected(false);
+                choiceTwoButton.setSelected(true);
+                /*choiceOneButton.setBackgroundResource(R.drawable.background_rounded_green);
+                choiceTwoButton.setBackgroundResource(R.drawable.background_rounded_yellow);*/
+                nextQuestion(0, 1);
+            }
+        });
+
+        privacyLink.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder privacyPolicyDialog = new AlertDialog.Builder(activity, R.style.AlertDialogCustom);
+                privacyPolicyDialog.setTitle(R.string.privacyPolicy);
+                privacyPolicyDialog.setMessage(R.string.privacyPolicyContent);
+                privacyPolicyDialog.setPositiveButton(android.R.string.ok, null);
+                privacyPolicyDialog.create();
+                privacyPolicyDialog.show();
             }
         });
     }
@@ -110,5 +129,12 @@ public class ModeChooseExpander extends Expander {
         JSONArray array = new JSONArray();
         array.put(chosenMode);
         return array;
+    }
+
+    public void menuClick(View view) {
+        Log.i("ModeChooseExpander", "Launching about us");
+        Intent intent = new Intent(activity.getBaseContext(),
+                AboutUsActivity.class);
+        activity.startActivity(intent);
     }
 }

@@ -1,12 +1,11 @@
 package com.github.hintofbasil.crabbler;
 
 import android.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,8 +38,8 @@ public class AboutUsActivity extends AppCompatActivity implements AboutUsFragmen
             return;
         }
 
-        LinearLayout toolbarMenu = (LinearLayout) findViewById(R.id.toolbar_menu_button);
-        toolbarMenu.setVisibility(View.GONE);
+        /*LinearLayout toolbarMenu = (LinearLayout) findViewById(R.id.toolbar_menu_button);
+        toolbarMenu.setVisibility(View.GONE);*/
 
         Button menuButton = (Button) findViewById(R.id.back_button);
         menuButton.setOnClickListener(new View.OnClickListener() {
@@ -53,7 +52,7 @@ public class AboutUsActivity extends AppCompatActivity implements AboutUsFragmen
 
     public JSONArray readJSON() throws IOException, JSONException {
         InputStream jsonInputStream = getBaseContext().getResources().openRawResource(R.raw.about_us);
-        byte[] buffer = new byte[8192];
+        byte[] buffer = new byte[10592];
         int length = jsonInputStream.read(buffer);
         String jsonString = new String(buffer).substring(0, length);
         return new JSONArray(jsonString);
